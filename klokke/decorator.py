@@ -1,5 +1,5 @@
 from functools import wraps
-from typing import Any, Callable, TypeVar, cast
+from typing import Any, Callable, Optional, TypeVar, Union, cast, overload
 
 from .timer import Timer
 
@@ -7,13 +7,38 @@ from .timer import Timer
 F = TypeVar("F", bound=Callable[..., Any])
 
 
-def timed(fn: F) -> F:
-    """Decorates a function with a Timer, named by the function's module and qualified name"""
-    name = f"{fn.__module__}.{fn.__qualname__}"
+@overload
+def timed(__fn: F) -> F:
+    ...
 
-    @wraps(fn)
-    def wrapper(*args: Any, **kwargs: Any) -> Any:
-        with Timer(name):
-            return fn(*args, **kwargs)
 
-    return cast(F, wrapper)
+@overload
+def timed(*, name: Optional[str] = None, **timer_kwargs: Any) -> Callable[[F], F]:
+    ...
+
+
+def timed(
+    __fn: Optional[F] = None, *, name: Optional[str] = None, **timer_kwargs: Any
+) -> Union[F, Callable[[F], F]]:
+    """
+    Function decorator. Decorated functions are wrapped by
+    a timer named by the function's module and qualified name.
+    (unless explicitly named)
+    Any arguments that could be passed to a klokke.Timer constructor
+    can be passed as keyword arguments to the decorator instead
+    """
+
+    def _timed(fn: F) -> F:
+        _name = name or f"{fn.__module__}.{fn.__qualname__}"
+
+        @wraps(fn)
+        def wrapper(*args: Any, **kwargs: Any) -> Any:
+            with Timer(_name, **timer_kwargs):
+                return fn(*args, **kwargs)
+
+        return cast(F, wrapper)
+
+    if __fn is not None:
+        return _timed(__fn)
+
+    return _timed

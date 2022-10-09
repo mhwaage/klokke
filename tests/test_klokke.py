@@ -44,6 +44,20 @@ def test_timer_context() -> None:
     assert inner.elapsed.n_executed == 1
 
     assert (
-        str(outer) == f"outer: { outer.elapsed.total_time} seconds\n"
+        str(outer) == f"outer: {outer.elapsed.total_time} seconds\n"
         f"Of which:\n  inner: {inner.elapsed.total_time} seconds"
     )
+
+
+def test_autoprint_executes_passed_function() -> None:
+    rv = ""
+
+    def printer(s: str) -> None:
+        nonlocal rv
+        rv = s
+
+    with Timer("whatever", autoprint=printer):
+        pass
+
+    assert rv != ""
+    assert "whatever:" in rv

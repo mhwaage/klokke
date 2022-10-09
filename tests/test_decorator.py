@@ -70,3 +70,20 @@ def test_timed_times_multiple_calls_correctly() -> None:
         second_inner_exit - second_inner_enter
     )
     assert inner_timing.n_executed == 2
+
+
+def test_timed_correctly_forwards_autoprint() -> None:
+    rv = ""
+
+    def printer(s: str) -> None:
+        nonlocal rv
+        rv = s
+
+    @timed(autoprint=printer)
+    def foo() -> int:
+        return 1
+
+    _ = foo()
+
+    assert rv != ""
+    assert "foo:" in rv
