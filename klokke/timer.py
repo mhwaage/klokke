@@ -2,7 +2,7 @@ import time
 from collections import defaultdict
 from copy import deepcopy
 from dataclasses import dataclass, field
-from typing import Any, DefaultDict, List, Optional
+from typing import Any, Callable, DefaultDict, List, Optional
 
 
 def _pad_newlines(s: str) -> str:
@@ -75,6 +75,8 @@ class Timer:
     elapsed: Elapsed = field(init=False, default_factory=Elapsed)
     start: float = field(init=False, default=0.0)
     end: float = field(init=False, default=0.0)
+    # TODO: Make autoprint be keyword only when only supporting python > 3.10
+    autoprint: Optional[Callable[[str], Any]] = field(default=None)
 
     def __str__(self) -> str:
         s = f"{self.name}: {self.elapsed}"
@@ -102,6 +104,9 @@ class Timer:
         parent_timer = context.current_timer()
         if parent_timer is not None:
             parent_timer.track_sub_timer(self)
+
+        if self.autoprint is not None:
+            self.autoprint(str(self))
 
     def track_sub_timer(self, sub_timer: "Timer") -> None:
         self.elapsed.sub_timers[sub_timer.name] += sub_timer.elapsed

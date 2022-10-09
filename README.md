@@ -46,3 +46,27 @@ bar: 4.010395050048828 seconds
 Of which:
   __main__.foo: 4.010124683380127 seconds
 ```
+
+Setting up timers to automatically print on completion:
+```python
+>>> from time import sleep
+>>> from klokke import Timer
+>>> with Timer("Something expensive", autoprint=print) as timer:
+...     sleep(5)
+... 
+Something expensive: 5.000231981277466 seconds
+```
+
+All keyword arguments to `Timer` can also be passed through the `@timed` decorator:
+```python
+>>> from time import sleep
+>>> from klokke import timed
+>>> import logging
+>>> logger = logging.getLogger("foo")
+>>> @timed(name="foo_log", autoprint=logger.warning)
+... def foo():
+...     sleep(1)
+... 
+>>> foo()
+foo_log: 1.0042669773101807 seconds
+```
