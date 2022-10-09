@@ -1,5 +1,6 @@
 # klokke
 klokke is a small library for high level measurement of code execution time. klokke keeps track of running timers, and nests them according to execution order. This allows you to keep track of which sub-sections of code contributes the most to your overall time spent.
+In addition, a decorator `@timed` is provided for timing function execution.
 
 ## Examples
 Timing a snippet of code:
@@ -26,4 +27,22 @@ Nesting timers:
 outer: 3.0084269046783447 seconds
 Of which:
   inner: 1.0031757354736328 seconds
+```
+
+Using a decorator:
+```python
+>>> from time import sleep
+>>> from klokke import Timer, timed
+>>> @timed
+... def foo():
+...     sleep(2)
+...     return 5
+... 
+>>> with Timer("bar") as t:
+...     x = foo() + foo()
+... 
+>>> print(t)
+bar: 4.010395050048828 seconds
+Of which:
+  __main__.foo: 4.010124683380127 seconds
 ```
