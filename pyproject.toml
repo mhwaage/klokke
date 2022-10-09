@@ -4,6 +4,7 @@ version = "0.1.0"
 description = "A small library for high level measurement of code execution time"
 authors = ["Magnus Heskestad Waage <magnushwaage@gmail.com>"]
 readme = "README.md"
+license = "MIT"
 
 [tool.poetry.dependencies]
 python = "^3.8"
